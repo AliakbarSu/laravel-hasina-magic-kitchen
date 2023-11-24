@@ -16,8 +16,11 @@ source ~/.bash_profile;
 
 # Install git
 sudo yum install git -y
-git clone https://github.com/AliakbarSu/Hasina-Magic-Kitchen.git;
-cd Hasina-Magic-Kitchen
+git clone https://github.com/AliakbarSu/laravel-hasina-magic-kitchen.git;
+cd laravel-hasina-magic-kitchen
 
 # Start docker
 sudo systemctl start docker.service;
+
+# starting the application
+docker-compose up -d --build;

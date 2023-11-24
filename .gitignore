@@ -39,3 +39,6 @@ yarn-error.log
 .terraform
 terraform.tfstate
 terraform.tfstate.backup
+
+# Docker
+/mysql
