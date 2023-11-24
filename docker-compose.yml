@@ -48,7 +48,7 @@ services:
         depends_on:
             - mysql
         env_file:
-            - ./src/.env
+            - ./src/.example.env
         environment:
             DB_CONNECTION: mysql
             RDS_HOSTNAME: mysql
