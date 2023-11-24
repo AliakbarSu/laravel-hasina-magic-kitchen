@@ -40,5 +40,5 @@ resource "aws_launch_template" "web_server" {
     }
   }
 
-  user_data = filebase64("${path.module}/scripts/install-apache.sh")
+  user_data = filebase64("${path.module}/scripts/install-docker.sh")
 }
