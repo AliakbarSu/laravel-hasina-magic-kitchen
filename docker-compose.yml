@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+    # Web Server Service
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        ports:
+            - '8080:80'
+        volumes:
+            - ./src:/var/www
+            - ./nginx/conf.d/:/etc/nginx/conf.d/
+        depends_on:
+            - app
+            - mysql
+
+    #Database Service
+    mysql:
+        image: mysql:8.2.0
+        command: --default-authentication-plugin=mysql_native_password
+        container_name: mysql
+        volumes:
+            - ./mysql/data:/var/lib/mysql
+        ports:
+            - '3306:3306'
+        environment:
+            MYSQL_PASSWORD: root
+            MYSQL_USER: root
+            MYSQL_DATABASE: mydatabase
+            MYSQL_ROOT_USER: root
+            MYSQL_ROOT_PASSWORD: root
+
+    # Application Service
+    app:
+        container_name: app
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - ./src:/var/www
+        ports:
+            - '9000:9000'
+        working_dir: /var/www
+        links:
+            - mysql
+        restart: always
+        depends_on:
+            - mysql
+        env_file:
+            - ./src/.env
+        environment:
+            DB_CONNECTION: mysql
+            RDS_HOSTNAME: mysql
+            RDS_PORT: 3306
+            RDS_DB_NAME: mydatabase
+            RDS_USERNAME: root
+            RDS_PASSWORD: root
+
+    # phpMyAdmin Service
+    phpmyadmin:
+        platform: linux/amd64
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        restart: always
+        links:
+            - mysql:db
+        ports:
+            - '3400:80'
+        depends_on:
+            - mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
