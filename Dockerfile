@@ -1,5 +1,8 @@
 FROM php:8.1.0-fpm-alpine
 
-RUN docker-php-ext-install pdo pdo_mysql \
-    && chown -R root:root /var/www \
-    && chmod 755 /var/www
+WORKDIR /var/www
+
+RUN docker-php-ext-install pdo pdo_mysql
+
+RUN chown -R www-data:www-data /var/www
+RUN chmod 755 /var/www
