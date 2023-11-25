@@ -5,13 +5,11 @@ services:
     nginx:
         build:
             context: .
-            dockerfile: DockerFile_php
-#        image: nginx:alpine
+            dockerfile: docker_files/Nginx
         container_name: nginx
         ports:
             - '80:80'
         volumes:
-#            - ./src:/var/www
             - ./nginx/conf.d/:/etc/nginx/conf.d/
         depends_on:
             - app
@@ -36,9 +34,7 @@ services:
         container_name: app
         build:
             context: .
-            dockerfile: Dockerfile
-#        volumes:
-#            - ./src:/var/www
+            dockerfile: docker_files/DockerPhp
         ports:
             - '9000:9000'
         working_dir: /var/www
@@ -48,14 +44,7 @@ services:
         depends_on:
             - mysql
         env_file:
-            - ./src/.env.example
-        environment:
-            DB_CONNECTION: mysql
-            RDS_HOSTNAME: mysql
-            RDS_PORT: 3306
-            RDS_DB_NAME: mydatabase
-            RDS_USERNAME: root
-            RDS_PASSWORD: root
+            - .env
 
     # phpMyAdmin Service
     phpmyadmin:

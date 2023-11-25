@@ -171,6 +171,8 @@ resource "aws_instance" "web" {
     version = "$Latest"
   }
 
+  iam_instance_profile = "${aws_iam_instance_profile.magic_kitchen_profile.name}"
+
   tags = {
     Name = "WebServer-running-laravel"
   }
