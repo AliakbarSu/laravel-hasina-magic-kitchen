@@ -3,15 +3,15 @@ version: '3.8'
 services:
     # Web Server Service
     nginx:
-#        build:
-#            context: .
-#            dockerfile: DockerFile_php
-        image: nginx:alpine
+        build:
+            context: .
+            dockerfile: DockerFile_php
+#        image: nginx:alpine
         container_name: nginx
         ports:
             - '80:80'
         volumes:
-            - ./src:/var/www
+#            - ./src:/var/www
             - ./nginx/conf.d/:/etc/nginx/conf.d/
         depends_on:
             - app
@@ -37,8 +37,8 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        volumes:
-            - ./src:/var/www
+#        volumes:
+#            - ./src:/var/www
         ports:
             - '9000:9000'
         working_dir: /var/www
