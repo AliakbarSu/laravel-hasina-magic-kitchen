@@ -9,9 +9,13 @@ resource "aws_launch_template" "web_server" {
 #     }
 #   }
 
-  image_id = "ami-07b5c2e394fccab6e"
+  image_id = var.ami_image_id
   instance_initiated_shutdown_behavior = "terminate"
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.magic_kitchen_profile.name
+  }
 
   metadata_options {
     http_endpoint               = "enabled"
@@ -30,7 +34,7 @@ resource "aws_launch_template" "web_server" {
   }
 
   placement {
-    availability_zone = "ap-southeast-2"
+    availability_zone = var.availability_zones[0]
   }
 
   tag_specifications {

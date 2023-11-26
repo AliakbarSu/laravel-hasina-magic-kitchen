@@ -13,21 +13,21 @@ services:
             - ./nginx/conf.d/:/etc/nginx/conf.d/
         depends_on:
             - app
-            - mysql
+            # - mysql
 
     #Database Service
-    mysql:
-        image: mysql:8.2.0
-        command: --default-authentication-plugin=mysql_native_password
-        container_name: mysql
-        volumes:
-            - ./mysql/data:/var/lib/mysql
-        ports:
-            - '3306:3306'
-        environment:
-            MYSQL_DATABASE: mydatabase
-            MYSQL_ROOT_USER: root
-            MYSQL_ROOT_PASSWORD: root
+    # mysql:
+    #     image: mysql:8.2.0
+    #     command: --default-authentication-plugin=mysql_native_password
+    #     container_name: mysql
+    #     volumes:
+    #         - ./mysql/data:/var/lib/mysql
+    #     ports:
+    #         - '3306:3306'
+    #     environment:
+    #         MYSQL_DATABASE: mydatabase
+    #         MYSQL_ROOT_USER: root
+    #         MYSQL_ROOT_PASSWORD: root
 
     # Application Service
     app:
@@ -38,25 +38,30 @@ services:
         ports:
             - '9000:9000'
         working_dir: /var/www
-        links:
-            - mysql
+        # links:
+        #     - mysql
+        # dns:
+        #     # - '172.31.0.2'
+        #     - 172.31.0.0
+        #     - 8.8.8.8
+        #     # - '8.8.4.4'
         restart: always
-        depends_on:
-            - mysql
+        # depends_on:
+        #     - mysql
         env_file:
             - .env
 
     # phpMyAdmin Service
-    phpmyadmin:
-        platform: linux/amd64
-        image: phpmyadmin/phpmyadmin
-        container_name: phpmyadmin
-        restart: always
-        links:
-            - mysql:db
-        ports:
-            - '3400:80'
-        depends_on:
-            - mysql
-        environment:
-            MYSQL_ROOT_PASSWORD: root
+    # phpmyadmin:
+    #     platform: linux/amd64
+    #     image: phpmyadmin/phpmyadmin
+    #     container_name: phpmyadmin
+    #     restart: always
+    #     links:
+    #         - mysql:db
+    #     ports:
+    #         - '3400:80'
+    #     depends_on:
+    #         - mysql
+    #     environment:
+    #         MYSQL_ROOT_PASSWORD: root
