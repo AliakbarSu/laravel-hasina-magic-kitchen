@@ -6,3 +6,5 @@ availability_zones=["ap-southeast-2a", "ap-southeast-2b"]
 ami_image_id="ami-07b5c2e394fccab6e"
 instance_type="t2.micro"
 rds_username="admin"
+domain_name="hasina.store"
+ssl_certificate_arn="arn:aws:acm:ap-southeast-2:092355519212:certificate/211e5da7-6d31-439d-bbcf-505cd3bce8e6"
