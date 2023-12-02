@@ -20,16 +20,6 @@ resource "aws_security_group_rule" "allow_tcp_rds" {
     security_group_id = aws_security_group.rds.id
 }
 
-resource "aws_security_group_rule" "allow_tcp_egress_rds" {
-    type              = "egress"
-    description      = "Allow TCP from default VPC"
-    from_port        = 3306
-    to_port          = 3306
-    protocol         = "tcp"
-    source_security_group_id = aws_security_group.web_server.id
-    security_group_id = aws_security_group.rds.id
-}
-
 resource "aws_db_instance" "web_server_database" {
   allocated_storage    = 20
   multi_az             = false
@@ -41,6 +31,9 @@ resource "aws_db_instance" "web_server_database" {
   instance_class       = "db.t3.micro"
   username             = var.rds_username
   password             = var.rds_password
+  lifecycle {
+    prevent_destroy = true
+  }
   vpc_security_group_ids      = [aws_security_group.rds.id]
 #   parameter_group_name = "default.mysql5.7"
   skip_final_snapshot  = true

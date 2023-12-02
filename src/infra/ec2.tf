@@ -44,18 +44,6 @@ resource "aws_security_group_rule" "allow_ssh" {
     security_group_id = aws_security_group.web_server.id
 }
 
-resource "aws_security_group_rule" "allow_tcp" {
-    type              = "ingress"
-    description      = "Allow TCP from default VPC"
-    from_port        = 3306
-    to_port          = 3306
-    protocol         = "tcp"
-    source_security_group_id = data.aws_security_group.default.id
-#    cidr_blocks      = data.aws_security_group.default
-#    ipv6_cidr_blocks = ["::/0"]
-    security_group_id = aws_security_group.web_server.id
-}
-
 resource "aws_security_group_rule" "allow_https" {
     type              = "ingress"
     description      = "Allow HTTPS from anywhere"
@@ -95,9 +83,7 @@ resource "aws_security_group_rule" "allow_tcp_egress" {
     from_port        = 3306
     to_port          = 3306
     protocol         = "tcp"
-    source_security_group_id = data.aws_security_group.default.id
-#    cidr_blocks      = data.aws_security_group.default
-#    ipv6_cidr_blocks = ["::/0"]
+    source_security_group_id = aws_security_group.rds.id
     security_group_id = aws_security_group.web_server.id
 }
 
@@ -122,7 +108,7 @@ resource "aws_lb_target_group" "lb-tg" {
   name     = "hasinaMagicKitchen-lb-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = "vpc-09d21e9169a0ef740"
+  vpc_id   = var.vpc_id
 }
 
 # resource "aws_eip" "lb" {
@@ -145,18 +131,35 @@ resource "aws_lb" "hasinaMagicKitchen-lb" {
   }
 }
 
-resource "aws_lb_listener" "web_server" {
+resource "aws_lb_listener" "web_server_http_redirect" {
   load_balancer_arn = aws_lb.hasinaMagicKitchen-lb.arn
   port              = "80"
   protocol          = "HTTP"
-  # ssl_policy        = "ELBSecurityPolicy-2016-08"
-  # certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "web_server_https" {
+  load_balancer_arn = aws_lb.hasinaMagicKitchen-lb.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.ssl_certificate_arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.lb-tg.arn
   }
 }
+
 
 resource "aws_autoscaling_group" "hasina_magic_kitchen" {
   name                      = "${var.namespace}-web-server-autoscaling-group"
@@ -184,19 +187,3 @@ resource "aws_autoscaling_attachment" "hasina-magic-kitchen" {
   autoscaling_group_name = aws_autoscaling_group.hasina_magic_kitchen.id
   lb_target_group_arn    = aws_lb_target_group.lb-tg.arn
 }
-
-
-# resource "aws_instance" "web" {
-#   count         = 1
-#   instance_type = "t2.micro"
-#   launch_template {
-#     id      = aws_launch_template.web_server.id
-#     version = "$Latest"
-#   }
-
-#   iam_instance_profile = aws_iam_instance_profile.magic_kitchen_profile.name
-
-#   tags = {
-#     Name = "WebServer-running-laravel"
-#   }
-# }

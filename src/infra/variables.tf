@@ -51,3 +51,15 @@ variable "rds_password" {
     default     = ""
     description = "Default db password to create resources in"
 }
+
+variable "domain_name" {
+    type        = string
+    default     = "hasina.store"
+    description = "Default domain name to create resources in"
+}
+
+variable "ssl_certificate_arn" {
+    type        = string
+    default     = ""
+    description = "The arn of your ssl certificate on AWS"
+}
