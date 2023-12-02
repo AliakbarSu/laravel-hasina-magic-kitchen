@@ -32,12 +32,6 @@ create_ssm_parameter "$ssm_prefix/RDS_PASSWORD" "root"
 
 # ... (continue for other parameters)
 
-# AWS-related parameters
-create_ssm_parameter "$ssm_prefix/AWS_ACCESS_KEY_ID" "AKIARLD7HJBIJCC2X5RF"
-create_ssm_parameter "$ssm_prefix/AWS_SECRET_ACCESS_KEY" "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"
-create_ssm_parameter "$ssm_prefix/AWS_DEFAULT_REGION" "ap-southeast-2"
-create_ssm_parameter "$ssm_prefix/AWS_BUCKET" ""
-
 # Pusher parameters
 create_ssm_parameter "$ssm_prefix/PUSHER_APP_ID" ""
 create_ssm_parameter "$ssm_prefix/PUSHER_APP_KEY" ""
