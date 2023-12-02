@@ -5,12 +5,12 @@ services:
     nginx:
         build:
             context: .
-            dockerfile: docker_files/Nginx
+            dockerfile: dockerize/Dockerfile_nginx
         container_name: nginx
         ports:
             - '80:80'
         volumes:
-            - ./nginx/conf.d/:/etc/nginx/conf.d/
+            - ./dockerize/nginx/conf.d/:/etc/nginx/conf.d/
         depends_on:
             - app
             # - mysql
@@ -34,7 +34,7 @@ services:
         container_name: app
         build:
             context: .
-            dockerfile: docker_files/DockerPhp
+            dockerfile: dockerize/Dockerfile_php
         ports:
             - '9000:9000'
         working_dir: /var/www
