@@ -7,7 +7,8 @@
 /public/hot
 /public/storage
 /storage/*.key
-/vendor
+**/*/vendor
+/src/vendor
 .env
 .env.backup
 .env.production
@@ -22,7 +23,7 @@ yarn-error.log
 /.eslintcache
 
 ### VisualStudioCode ###
-.vscode/* 
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json

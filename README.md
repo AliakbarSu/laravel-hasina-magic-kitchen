@@ -30,3 +30,13 @@ This project is not open for contributions at this time.
     - php artisan inertia:start-ssr
     - php artisan serve
     - php run dev
+
+## Deployment on EKS
+In order to deploy this application on AWS EKS, we need to build two docker images with names 
+- `alisultani/hasina-magic-kitchen:frontend-v1`
+- `alisultani/hasina-magic-kitchen:backend-v1`
+
+Next we need to create a VPC
+Next we need to create an EKS cluster
+Next we need to create an EFS file system
+
