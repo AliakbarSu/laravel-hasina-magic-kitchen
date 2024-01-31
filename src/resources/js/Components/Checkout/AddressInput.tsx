@@ -1,18 +1,25 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-export function AddressInput(props: {
-    isAddressValidated: boolean;
-    setIsAddressValidated: (value: boolean) => void;
-    setState: (value: string) => void;
-    setError: (err: string | null) => void;
-}) {
-    const [address1, setAddress1] = useState('');
-    const [suburb, setSuburb] = useState('');
-    const [city, setCity] = useState('Auckland');
-    const [postCode, setPostCode] = useState('');
+const AddressInput = ({
+    onAddressChange,
+}: {
+    onAddressChange: (address: string) => void;
+}) => {
+    const [address, setAddress] = useState<{
+        address1: string;
+        suburb: string;
+        city: string;
+        postCode: string;
+    }>({
+        address1: '',
+        suburb: '',
+        city: 'Auckland',
+        postCode: '',
+    });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [__, setHasError] = useState(false);
+    const [isValidAddress, setIsValidAddress] = useState(false);
 
     let timeout: NodeJS.Timeout;
     const debounce = function (func: () => Promise<void>, delay: number) {
@@ -21,32 +28,28 @@ export function AddressInput(props: {
     };
 
     useEffect(() => {
-        const address = {
-            address1,
-            suburb,
-            city,
-            postCode,
-        };
         debounce(() => {
-            props.setIsAddressValidated(false);
             return axios
                 .post('/api/validate/address', {
-                    address: `${address1}, ${suburb}`,
+                    address: `${address.address1}, ${address.suburb}`,
                 })
                 .then((result) => {
                     const isValid = result.data.validation_result;
-                    setHasError(!isValid);
-                    if (!isValid) {
-                        props.setError('Invalid address');
-                    } else {
-                        props.setError(null);
-                    }
-                    props.setIsAddressValidated(true);
+                    setIsValidAddress(isValid);
                 });
         }, 200);
+        onAddressChange(`${address.address1}, ${address.suburb}`);
+    }, [address]);
 
-        props.setState(`${address.address1}, ${address.suburb}`);
-    }, [address1, suburb, city, postCode]);
+    const onAddressChangeHandler = (
+        component: keyof typeof address,
+        value: string
+    ) => {
+        setAddress((prev) => ({
+            ...prev,
+            [component]: value,
+        }));
+    };
 
     return (
         <div>
@@ -60,8 +63,10 @@ export function AddressInput(props: {
                             Address Line 1
                         </label>
                         <input
-                            value={address1}
-                            onChange={({ target }) => setAddress1(target.value)}
+                            value={address.address1}
+                            onChange={({ target: { value } }) =>
+                                onAddressChangeHandler('address1', value)
+                            }
                             type="text"
                             name="address"
                             id="address"
@@ -74,8 +79,10 @@ export function AddressInput(props: {
                             Suburb
                         </label>
                         <input
-                            value={suburb}
-                            onChange={({ target }) => setSuburb(target.value)}
+                            value={address.suburb}
+                            onChange={({ target: { value } }) =>
+                                onAddressChangeHandler('suburb', value)
+                            }
                             type="text"
                             name="suburb"
                             id="suburb"
@@ -90,8 +97,10 @@ export function AddressInput(props: {
                             </label>
                             <input
                                 disabled
-                                onChange={({ target }) => setCity(target.value)}
-                                value={city}
+                                onChange={({ target: { value } }) =>
+                                    onAddressChangeHandler('city', value)
+                                }
+                                value={address.city}
                                 type="text"
                                 name="city"
                                 id="city"
@@ -104,9 +113,9 @@ export function AddressInput(props: {
                                 Postcode
                             </label>
                             <input
-                                value={postCode}
-                                onChange={({ target }) =>
-                                    setPostCode(target.value)
+                                value={address.postCode}
+                                onChange={({ target: { value } }) =>
+                                    onAddressChangeHandler('postCode', value)
                                 }
                                 type="text"
                                 name="postcode"
@@ -118,6 +127,17 @@ export function AddressInput(props: {
                     </div>
                 </div>
             </fieldset>
+            {isValidAddress ? (
+                <span className="flex items-center font-medium tracking-wide text-green-500 text-xs ml-1">
+                    waiting for validation...
+                </span>
+            ) : (
+                <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1">
+                    address is not valid
+                </span>
+            )}
         </div>
     );
-}
+};
+
+export default AddressInput;

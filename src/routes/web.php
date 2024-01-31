@@ -24,8 +24,9 @@ use Inertia\Inertia;
 
 // Route::inertia("about", "About");
 
-Route::get('/checkout', function () {
-    return Inertia::render('Checkout', []);
+Route::get('/checkout', function (Orders $orders) {
+    $order_dates = $orders->get_confirmed_orders_dates();
+    return Inertia::render('Checkout', ["orders" => $order_dates]);
 })->name('profile.checkout');
 
 Route::get('/admin', function () {
@@ -33,10 +34,10 @@ Route::get('/admin', function () {
 });
 
 Route::get('/', function (
-    Menu $menu,
+    Menu           $menu,
     DishController $dishes,
-    Dish $dish,
-    Category $category
+    Dish           $dish,
+    Category       $category
 ) {
     return Inertia::render('Home', [
         // 'canLogin' => Route::has('login'),

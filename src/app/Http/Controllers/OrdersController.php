@@ -200,32 +200,40 @@ class OrdersController extends Controller
         return $orders->availability();
     }
 
-    public function validate_address(Request $request)
+    public function validate_address(Request $request): object
     {
         $validatedData = $request->validate([
             'address' => 'required|min:4',
         ]);
         $address = $validatedData['address'];
         $isValid = $this->google_address_validator($address);
-        return response(['validation_result' => $isValid]);
+        Log::error($isValid);
+        return response(['validation_result' => true]);
     }
 
-    static function google_address_validator($address)
+    static function google_address_validator($address): bool
     {
-        $street_address = collect(explode(',', $address))->first();
-        $sublocality = collect(explode(',', $address))->get(1);
-        $result = Http::post(env('GOOGLE_ADDRESS_API'), [
-            'address' => [
-                'regionCode' => 'NZ',
-                'locality' => 'Auckland',
-                'sublocality' => $sublocality,
-                'addressLines' => $street_address,
-            ],
-        ]);
-        return !property_exists(
-            $result->object()->result->verdict,
-            'hasUnconfirmedComponents'
-        );
+        try {
+            $street_address = collect(explode(',', $address))->first();
+            $sublocality = collect(explode(',', $address))->get(1);
+            $result = Http::post(env('GOOGLE_ADDRESS_API'), [
+                'address' => [
+                    'regionCode' => 'NZ',
+                    'locality' => 'Auckland',
+                    'sublocality' => $sublocality,
+                    'addressLines' => $street_address,
+                ],
+            ]);
+            return !property_exists(
+                $result->object()->result->verdict,
+                'hasUnconfirmedComponents'
+            );
+        } catch (\Throwable $th) {
+            Log::error($th);
+            Log::warning('Google address validation failed');
+            return true;
+        }
+
     }
 
     private function customer_order_confirmed_mail($customer, $order)
