@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Dish;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -13,14 +13,15 @@ class DishController extends Controller
     {
         return $dishes->get_menus_with_media();
     }
-    public function dish($id)
+
+    public function dish($id): string
     {
         return Dish::with(['category', 'menus'])
             ->find($id)
             ->toJson();
     }
 
-    public function add_dish(Request $request)
+    public function add_dish(Request $request): string
     {
         $validatedData = $request->validate([
             'name' => ['required'],
@@ -38,19 +39,24 @@ class DishController extends Controller
         return $dish->toJson();
     }
 
-    public function add_dish_media(Request $request, Dish $dishes)
+    public function add_dish_media(Request $request, Dish $dishes): string
     {
         $validatedData = $request->validate([
             'id' => ['required'],
             'image' => ['required'],
         ]);
         $dish = $dishes->all()->find($validatedData['id']);
-        $dish->attachMedia($request->file('image'));
+        try {
+            $dish->attachMedia($request->file('image'));
+        } catch (Exception $e) {
+            Log::error('Failed to add media for dish', $dish->id);
+            Log::error($e->getMessage());
+        }
         Log::info('Dish media added', ['id' => $dish->id]);
         return response()->json(['message' => 'Dish media added'], 200);
     }
 
-    public function delete_dish(Request $request)
+    public function delete_dish(Request $request): string
     {
         $dish = Dish::find($request->id);
         $dish->delete();

@@ -24,7 +24,7 @@ export default function Example() {
                                 <div className="flex flex-shrink-0 items-center">
                                     <Link href={route('main.home')}>
                                         <h1 className="font-extrabold font-mono text-white text-2xl">
-                                            HSM
+                                            Hasina's Magic Kitchen
                                         </h1>
                                     </Link>
                                 </div>

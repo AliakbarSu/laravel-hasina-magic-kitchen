@@ -16,7 +16,7 @@ export default function Header() {
                             Hasina Magic Kitchen
                         </h2>
                         <p className="mt-4 text-lg tracking-tight text-blue-200">
-                            Magical meals for your magical momments
+                            Magical meals for your magical moments
                         </p>
                     </div>
                 </Container>
