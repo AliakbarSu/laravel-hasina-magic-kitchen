@@ -24,6 +24,26 @@ class Orders extends Model
         'status',
     ];
 
+    static function can_palce_order()
+    {
+        $orders = Orders::where('date', '=', date('today'))->get();
+        return $orders->count() <= 3;
+    }
+
+    public function get_confirmed_orders_dates()
+    {
+        return $this->all()
+            ->where('status', '=', 'confirmed')->map(function ($order) {
+                return $order->date;
+            });
+    }
+
+    public function get_order_by_id(string $id)
+    {
+        $order = $this->all_orders()->find($id);
+        return $order;
+    }
+
     public function all_orders()
     {
         $orders = $this->with([
@@ -60,10 +80,14 @@ class Orders extends Model
         });
     }
 
-    public function get_order_by_id(string $id)
+    static function add_media($item)
     {
-        $order = $this->all_orders()->find($id);
-        return $order;
+        return array_map(function ($media) {
+            return [
+                'id' => $media['id'],
+                'url' => $media['file_url'],
+            ];
+        }, $item->fetchAllMedia()->toArray());
     }
 
     public function items()
@@ -105,21 +129,5 @@ class Orders extends Model
             ];
         }
         return $dates;
-    }
-
-    static function can_palce_order()
-    {
-        $orders = Orders::where('date', '=', date('today'))->get();
-        return $orders->count() <= 3;
-    }
-
-    static function add_media($item)
-    {
-        return array_map(function ($media) {
-            return [
-                'id' => $media['id'],
-                'url' => $media['file_url'],
-            ];
-        }, $item->fetchAllMedia()->toArray());
     }
 }

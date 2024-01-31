@@ -4,18 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmed;
 use App\Mail\OrderCreated;
-use App\Models\OrderDishes;
 use App\Models\Orders;
 use App\Rules\AddressExits;
 use App\Services\TaxCalculations\TaxCalculations;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class OrdersController extends Controller
 {
     private $delivery_fee_rate = 25.0;
+
+    public function get_confirmed_orders_dates(Orders $orders): string
+    {
+        return $orders->get_confirmed_orders_dates()->toJson();
+    }
+
     public function all_orders(Orders $orders)
     {
         return $orders->all_orders()->toJson();
@@ -27,9 +32,10 @@ class OrdersController extends Controller
     }
 
     public function add_order(
-        Request $request,
+        Request             $request,
         CustomersController $customersController
-    ) {
+    )
+    {
         $validatedData = $this->validate_order($request);
         // TODO Needs to be implemented
         // TODO Add notofiication about new order to the admin
@@ -45,6 +51,31 @@ class OrdersController extends Controller
             'id' => $order->id,
             'message' => 'Order created successfully',
             'client_secret' => $payment_intent->client_secret,
+        ]);
+    }
+
+    private function validate_order($request)
+    {
+        return $request->validate([
+            'customer_name' => ['required', 'string', 'max:50'],
+            'phone' => ['required', 'numeric', 'min:10'],
+            'email' => ['required', 'email'],
+            'address' => ['required', 'string', new AddressExits()],
+            'date' => ['required', 'date'],
+            'time' => ['required', 'date_format:H:i'],
+            'note' => ['string', 'max:80'],
+            'items' => ['required', 'array'],
+            'items.*.dishes' => [
+                'required',
+                'array',
+                'distinct',
+                'exists:dishes,id',
+            ],
+            'items.*.menu_id' => ['required', 'uuid', 'exists:menus,id'],
+            'items.*.quantity' => ['numeric', 'max:500', 'min:1'],
+            'addons' => ['array'],
+            'addons.*.id' => ['exists:dishes,id'],
+            'addons.*.quantity' => ['numeric', 'min:1', 'max:500'],
         ]);
     }
 
@@ -106,31 +137,6 @@ class OrdersController extends Controller
         return $order->addons()->attach($convertedArray);
     }
 
-    private function validate_order($request)
-    {
-        return $request->validate([
-            'customer_name' => ['required', 'string', 'max:50'],
-            'phone' => ['required', 'numeric', 'min:10'],
-            'email' => ['required', 'email'],
-            'address' => ['required', 'string', new AddressExits()],
-            'date' => ['required', 'date'],
-            'time' => ['required', 'date_format:H:i'],
-            'note' => ['string', 'max:80'],
-            'items' => ['required', 'array'],
-            'items.*.dishes' => [
-                'required',
-                'array',
-                'distinct',
-                'exists:dishes,id',
-            ],
-            'items.*.menu_id' => ['required', 'uuid', 'exists:menus,id'],
-            'items.*.quantity' => ['numeric', 'max:500', 'min:1'],
-            'addons' => ['array'],
-            'addons.*.id' => ['exists:dishes,id'],
-            'addons.*.quantity' => ['numeric', 'min:1', 'max:500'],
-        ]);
-    }
-
     private function calculate_subtotal(Orders $order)
     {
         $order_items_total = $order->items->reduce(function ($carry, $item) {
@@ -142,9 +148,9 @@ class OrdersController extends Controller
         return $order_items_total + $order_addons_total;
     }
 
-    private function calculate_total($order)
+    private function calculate_delivery_fee()
     {
-        return round($order->subtotal + $order->tax + $order->delivery_fee, 2);
+        return $this->delivery_fee_rate;
     }
 
     private function calculate_order_tax($order)
@@ -154,9 +160,9 @@ class OrdersController extends Controller
         return $taxCalculations->calculateGST($subTotal);
     }
 
-    private function calculate_delivery_fee()
+    private function calculate_total($order)
     {
-        return $this->delivery_fee_rate;
+        return round($order->subtotal + $order->tax + $order->delivery_fee, 2);
     }
 
     private function create_payment_intent($customer, $order)
@@ -189,18 +195,19 @@ class OrdersController extends Controller
         }
     }
 
-    private function customer_order_confirmed_mail($customer, $order)
-    {
-        try {
-            Mail::to($customer->email)->send(new OrderConfirmed($order));
-        } catch (\Throwable $th) {
-            Log::error($th);
-        }
-    }
-
     public function get_availability(Orders $orders)
     {
         return $orders->availability();
+    }
+
+    public function validate_address(Request $request)
+    {
+        $validatedData = $request->validate([
+            'address' => 'required|min:4',
+        ]);
+        $address = $validatedData['address'];
+        $isValid = $this->google_address_validator($address);
+        return response(['validation_result' => $isValid]);
     }
 
     static function google_address_validator($address)
@@ -221,13 +228,12 @@ class OrdersController extends Controller
         );
     }
 
-    public function validate_address(Request $request)
+    private function customer_order_confirmed_mail($customer, $order)
     {
-        $validatedData = $request->validate([
-            'address' => 'required|min:4',
-        ]);
-        $address = $validatedData['address'];
-        $isValid = $this->google_address_validator($address);
-        return response(['validation_result' => $isValid]);
+        try {
+            Mail::to($customer->email)->send(new OrderConfirmed($order));
+        } catch (\Throwable $th) {
+            Log::error($th);
+        }
     }
 }
