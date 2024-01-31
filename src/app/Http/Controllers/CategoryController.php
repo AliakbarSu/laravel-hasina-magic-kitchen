@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function all_categories()
+    public function all_categories(): string
     {
         return Category::all()->toJson();
     }
@@ -17,7 +17,7 @@ class CategoryController extends Controller
         return Category::find($id)->toJson();
     }
 
-    public function add_category(Request $request)
+    public function add_category(Request $request): string
     {
         $validatedData = $request->validate([
             'name' => ['required', 'max:50'],
@@ -30,7 +30,7 @@ class CategoryController extends Controller
         return $category->toJson();
     }
 
-    public function delete_category(Request $request)
+    public function delete_category(Request $request): string
     {
         $category = Category::find($request->id);
         $category->delete();
