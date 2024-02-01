@@ -35,9 +35,11 @@ class DatabaseSeeder extends Seeder
             $dish->attachMedia($file);
             return $dish;
         });
-        Category::factory(3)->create();
+        $categories = Category::factory(3)->create();
         $menus = Menu::factory(3)
-            ->create()
+            ->create([
+                'category_id' => $categories->random(1)->first()->getAttribute('id'),
+            ])
             ->each(function ($menu) use ($dishes, $file) {
                 $menu->dishes()->attach($dishes->random(rand(1, 3)));
                 $menu->options()->attach($dishes->random(rand(1, 2)));

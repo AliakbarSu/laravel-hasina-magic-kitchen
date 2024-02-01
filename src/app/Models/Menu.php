@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use CloudinaryLabs\CloudinaryLaravel\MediaAlly;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use CloudinaryLabs\CloudinaryLaravel\MediaAlly;
 
 class Menu extends Model
 {
@@ -17,7 +17,7 @@ class Menu extends Model
 
     public function get_menus_with_media()
     {
-        return $this->with(['dishes', 'options'])
+        return $this->with(['dishes', 'options', 'category'])
             ->get()
             ->each(function ($item) {
                 $item->media = $this->add_media($item);
@@ -32,6 +32,16 @@ class Menu extends Model
             });
     }
 
+    private function add_media($item)
+    {
+        return array_map(function ($media) {
+            return [
+                'id' => $media['id'],
+                'url' => $media['file_url'],
+            ];
+        }, $item->fetchAllMedia()->toArray());
+    }
+
     public function dishes()
     {
         return $this->belongsToMany(Dish::class, 'dish_menu');
@@ -42,18 +52,13 @@ class Menu extends Model
         return $this->belongsToMany(Dish::class, 'dish_menu_order');
     }
 
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
     public function options()
     {
         return $this->belongsToMany(Dish::class, 'menu_options');
-    }
-
-    private function add_media($item)
-    {
-        return array_map(function ($media) {
-            return [
-                'id' => $media['id'],
-                'url' => $media['file_url'],
-            ];
-        }, $item->fetchAllMedia()->toArray());
     }
 }

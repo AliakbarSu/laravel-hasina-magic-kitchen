@@ -2,8 +2,11 @@ import Modal from '@/Components/CustomizeModal';
 import { useEffect, useState } from 'react';
 import { Menu } from '@/types/application';
 import { setSelectedMenu } from '@/store/slice/menu';
-import { UsersIcon, PlusIcon, MinusIcon } from '@heroicons/react/20/solid';
+import { MinusIcon, PlusIcon, UsersIcon } from '@heroicons/react/20/solid';
 import { optimizeImage } from '@/utils/cloudinary';
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem, removeItem, updateQuantity } from '@/store/slice/cart';
+import { RootState } from '@/store';
 
 export default function MenuList({ menu }: { menu: Menu[] }) {
     return (
@@ -11,7 +14,7 @@ export default function MenuList({ menu }: { menu: Menu[] }) {
             <div className="bg-white">
                 <div className="max-w-2xl lg:max-w-6xl mx-auto pt-8">
                     <h2 className="text-3xl font-extrabold text-gray-900 pl-4 sm:pl-6">
-                        {'All Menus!'}
+                        Menu
                     </h2>
 
                     <div className="bg-white">
@@ -19,12 +22,18 @@ export default function MenuList({ menu }: { menu: Menu[] }) {
                             <h2 className="sr-only">Products</h2>
 
                             <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3 lg:gap-x-8">
-                                {menu.map((product) => (
-                                    <MenuItem
-                                        key={product.id}
-                                        product={product}
-                                    />
-                                ))}
+                                {menu.length == 0 ? (
+                                    <p className="pl-5 text-large">
+                                        No items in this category
+                                    </p>
+                                ) : (
+                                    menu.map((product) => (
+                                        <MenuItem
+                                            key={product.id}
+                                            product={product}
+                                        />
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>
@@ -35,10 +44,6 @@ export default function MenuList({ menu }: { menu: Menu[] }) {
         </>
     );
 }
-
-import { useDispatch, useSelector } from 'react-redux';
-import { addItem, removeItem, updateQuantity } from '@/store/slice/cart';
-import { RootState } from '@/store';
 
 export function MenuItem({ product }: { product: Menu }) {
     const [open, setOpen] = useState(false);

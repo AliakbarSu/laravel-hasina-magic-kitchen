@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Dish;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +19,8 @@ class MenuFactory extends Factory
         return [
             "name" => $this->faker->name(),
             "description" => $this->faker->text(50),
-            "price" => $this->faker->numberBetween(40, 150)
+            "price" => $this->faker->numberBetween(40, 150),
         ];
     }
+
 }

@@ -7,6 +7,7 @@ export interface Category {
     id: string;
     name: string;
     description: string;
+    image: string;
 }
 
 export interface Dish {
@@ -28,6 +29,7 @@ export interface Menu {
     dishes: Dish[];
     options: Dish[];
     created_at: string;
+    category: Category;
 }
 
 export interface Order {
