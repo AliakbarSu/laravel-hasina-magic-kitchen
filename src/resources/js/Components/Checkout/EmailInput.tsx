@@ -1,9 +1,42 @@
 import { EnvelopeIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
+import { z } from 'zod';
 
-export function EmailInput(props: {
-    state: string;
-    setState: (value: string) => void;
-}) {
+const EmailInput = ({
+    onValueChange,
+}: {
+    onValueChange: (value: string) => void;
+}) => {
+    const [inputState, setInputState] = useState<{
+        isValid: boolean;
+        isTouched: boolean;
+        isDirty: boolean;
+    }>({
+        isValid: false,
+        isTouched: false,
+        isDirty: false,
+    });
+    const [value, setValue] = useState<string>('');
+    const validationSchema = z.object({
+        value: z.string().email(),
+    });
+
+    const onValueChangeHandler = (value: string) => {
+        setValue(value);
+        onValueChange(value);
+        setInputState((prev) => ({
+            ...prev,
+            isDirty: value.length > 0,
+            isTouched: true,
+        }));
+        const results = validationSchema.safeParse({ value });
+        if (results.success) {
+            setInputState((prev) => ({ ...prev, isValid: true }));
+        } else {
+            setInputState((prev) => ({ ...prev, isValid: false }));
+        }
+    };
+
     return (
         <div>
             <label
@@ -20,8 +53,10 @@ export function EmailInput(props: {
                     />
                 </div>
                 <input
-                    value={props.state}
-                    onChange={(e) => props.setState(e.target.value)}
+                    value={value}
+                    onChange={({ target: { value } }) =>
+                        onValueChangeHandler(value)
+                    }
                     type="email"
                     name="email"
                     id="email"
@@ -29,6 +64,15 @@ export function EmailInput(props: {
                     placeholder="you@example.com"
                 />
             </div>
+            {inputState.isTouched &&
+                inputState.isDirty &&
+                !inputState.isValid && (
+                    <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1 mt-2">
+                        Email is required and must be valid.
+                    </span>
+                )}
         </div>
     );
-}
+};
+
+export default EmailInput;

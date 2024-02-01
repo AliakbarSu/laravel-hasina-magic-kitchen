@@ -17,9 +17,17 @@ const AddressInput = ({
         city: 'Auckland',
         postCode: '',
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [__, setHasError] = useState(false);
-    const [isValidAddress, setIsValidAddress] = useState(false);
+    const [inputState, setInputState] = useState<{
+        isValid: boolean;
+        isTouched: boolean;
+        isDirty: boolean;
+        validating: boolean;
+    }>({
+        isValid: false,
+        isTouched: false,
+        isDirty: false,
+        validating: false,
+    });
 
     let timeout: NodeJS.Timeout;
     const debounce = function (func: () => Promise<void>, delay: number) {
@@ -29,13 +37,18 @@ const AddressInput = ({
 
     useEffect(() => {
         debounce(() => {
+            setInputState((prev) => ({ ...prev, validating: true }));
             return axios
                 .post('/api/validate/address', {
                     address: `${address.address1}, ${address.suburb}`,
                 })
                 .then((result) => {
                     const isValid = result.data.validation_result;
-                    setIsValidAddress(isValid);
+                    setInputState((prev) => ({
+                        ...prev,
+                        isValid,
+                        validating: false,
+                    }));
                 });
         }, 200);
         onAddressChange(`${address.address1}, ${address.suburb}`);
@@ -45,6 +58,11 @@ const AddressInput = ({
         component: keyof typeof address,
         value: string
     ) => {
+        setInputState((prev) => ({
+            ...prev,
+            isDirty: value.length > 0,
+            isTouched: true,
+        }));
         setAddress((prev) => ({
             ...prev,
             [component]: value,
@@ -127,15 +145,21 @@ const AddressInput = ({
                     </div>
                 </div>
             </fieldset>
-            {isValidAddress ? (
-                <span className="flex items-center font-medium tracking-wide text-green-500 text-xs ml-1">
-                    waiting for validation...
-                </span>
-            ) : (
+            {!inputState.isValid &&
+            inputState.isDirty &&
+            inputState.isTouched &&
+            !inputState.validating ? (
                 <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1">
                     address is not valid
                 </span>
-            )}
+            ) : null}
+            {inputState.isTouched &&
+            inputState.isDirty &&
+            inputState.validating ? (
+                <span className="flex items-center font-medium tracking-wide text-green-500 text-xs ml-1">
+                    validating the address...
+                </span>
+            ) : null}
         </div>
     );
 };

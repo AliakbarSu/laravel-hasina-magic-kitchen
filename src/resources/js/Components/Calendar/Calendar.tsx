@@ -8,7 +8,7 @@ const Calendar = ({
     onDatePicked,
 }: {
     bookedDates: dayjs.Dayjs[];
-    onDatePicked: (value: dayjs.Dayjs | null) => void;
+    onDatePicked: (value: string) => void;
 }) => {
     const shouldDisableDate = (date: dayjs.Dayjs) => {
         if (bookedDates.length > 0) {
@@ -25,7 +25,13 @@ const Calendar = ({
                 maxDate={dayjs().add(3, 'months')}
                 disablePast={true}
                 shouldDisableDate={shouldDisableDate}
-                onChange={onDatePicked}
+                onChange={(value) =>
+                    onDatePicked(
+                        `${value?.get('year')}-${value?.get(
+                            'month'
+                        )}-${value?.get('date')}`
+                    )
+                }
             />
         </LocalizationProvider>
     );

@@ -31,7 +31,7 @@ export interface Menu {
 }
 
 export interface Order {
-    customer_name: string;
+    name: string;
     email: string;
     phone: number;
     address: string;

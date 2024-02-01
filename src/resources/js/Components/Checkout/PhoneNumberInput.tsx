@@ -1,7 +1,40 @@
-export function PhoneNumberInput(props: {
-    state: string;
-    setState: (value: string) => void;
-}) {
+import { useState } from 'react';
+import { z } from 'zod';
+
+export const PhoneNumberInput = ({
+    onValueChange,
+}: {
+    onValueChange: (value: string) => void;
+}) => {
+    const [inputState, setInputState] = useState<{
+        isValid: boolean;
+        isTouched: boolean;
+        isDirty: boolean;
+    }>({
+        isValid: false,
+        isTouched: false,
+        isDirty: false,
+    });
+    const [value, setValue] = useState<string>('');
+    const validationSchema = z.object({
+        value: z.string().min(6).max(14),
+    });
+
+    const onValueChangeHandler = (value: string) => {
+        setValue(value);
+        onValueChange(value);
+        setInputState((prev) => ({
+            ...prev,
+            isDirty: value.length > 0,
+            isTouched: true,
+        }));
+        const results = validationSchema.safeParse({ value });
+        if (results.success) {
+            setInputState((prev) => ({ ...prev, isValid: true }));
+        } else {
+            setInputState((prev) => ({ ...prev, isValid: false }));
+        }
+    };
     return (
         <div>
             <label
@@ -25,8 +58,10 @@ export function PhoneNumberInput(props: {
                     </select>
                 </div>
                 <input
-                    value={props.state}
-                    onChange={(e) => props.setState(e.target.value)}
+                    value={value}
+                    onChange={({ target: { value } }) =>
+                        onValueChangeHandler(value)
+                    }
                     type="number"
                     name="mobile-number"
                     id="mobile-number"
@@ -34,6 +69,13 @@ export function PhoneNumberInput(props: {
                     placeholder="(555) 987-6543"
                 />
             </div>
+            {inputState.isTouched &&
+                inputState.isDirty &&
+                !inputState.isValid && (
+                    <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1 mt-2">
+                        Mobile number is required and must be valid.
+                    </span>
+                )}
         </div>
     );
-}
+};

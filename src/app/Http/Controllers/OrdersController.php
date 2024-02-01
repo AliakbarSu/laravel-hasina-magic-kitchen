@@ -57,7 +57,7 @@ class OrdersController extends Controller
     private function validate_order($request)
     {
         return $request->validate([
-            'customer_name' => ['required', 'string', 'max:50'],
+            'name' => ['required', 'string', 'max:50'],
             'phone' => ['required', 'numeric', 'min:10'],
             'email' => ['required', 'email'],
             'address' => ['required', 'string', new AddressExits()],
@@ -82,7 +82,7 @@ class OrdersController extends Controller
     private function create_order($orderDetails, $customer_id): Orders
     {
         $order = new Orders();
-        $order->customer_name = $orderDetails['customer_name'];
+        $order->customer_name = $orderDetails['name'];
         $order->phone = $orderDetails['phone'];
         $order->email = $orderDetails['email'];
         $order->address = $orderDetails['address'];
@@ -148,7 +148,7 @@ class OrdersController extends Controller
         return $order_items_total + $order_addons_total;
     }
 
-    private function calculate_delivery_fee()
+    private function calculate_delivery_fee(): float
     {
         return $this->delivery_fee_rate;
     }

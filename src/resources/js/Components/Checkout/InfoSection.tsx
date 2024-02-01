@@ -1,10 +1,10 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import {
     PaymentElement,
     useElements,
     useStripe,
 } from '@stripe/react-stripe-js';
-import { router, useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { Addon, Order } from '@/types/application';
 import axios from 'axios';
 import { formatNZD } from '@/utils/currentcy';
@@ -21,7 +21,7 @@ import {
     selectCartTotal,
 } from '@/store/slice/cart';
 import { RootState } from '@/store';
-import { EmailInput } from '@/Components/Checkout/EmailInput';
+import EmailInput from '@/Components/Checkout/EmailInput';
 import { TimeInput } from '@/Components/Checkout/TimeInput';
 import { NameInput } from '@/Components/Checkout/NameInput';
 import { NoteInput } from '@/Components/Checkout/NoteInput';
@@ -36,8 +36,16 @@ const DEV_FEE = 25;
 const GST = 0.15;
 
 const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
-    const { setData, data, errors, setError, clearErrors, isDirty } = useForm({
-        customer_name: '',
+    const [formData, setFormData] = useState<{
+        name: string;
+        address: string;
+        date: string;
+        time: string;
+        phone: number;
+        email: string;
+        note: string;
+    }>({
+        name: '',
         address: '',
         date: '',
         time: '',
@@ -45,6 +53,37 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
         email: '',
         note: '',
     });
+
+    const [formState, setFormState] = useState<{
+        isValid: boolean;
+        isTouched: boolean;
+        isDirty: boolean;
+    }>({
+        isValid: false,
+        isTouched: false,
+        isDirty: false,
+    });
+
+    const onFormDataChangeHandler = (
+        component: keyof typeof formData,
+        value: string
+    ) => {
+        setFormData((prev) => ({
+            ...prev,
+            [component]: value,
+        }));
+    };
+
+    useEffect(() => {
+        const results = formSchema.safeParse({ ...formData });
+        const isValid = results.success;
+        setFormState((prev) => ({
+            ...prev,
+            isValid: isValid,
+            isDirty: true,
+            isTouched: true,
+        }));
+    }, [formData]);
     const elements = useElements();
     const stripe = useStripe();
     const dispatch = useDispatch();
@@ -55,12 +94,9 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
     const cartItems = useSelector((state: RootState) => state.cart.items);
     const cartTotal = useSelector(selectCartTotal);
     const cartAddons = useSelector((state: RootState) => state.cart.addons);
-    const [isAddressValidated, setIsAddressValidated] = useState(false);
-    const disableBtn =
-        loading || !isDirty || cartItems.length === 0 || !isAddressValidated;
 
     const formSchema = z.object({
-        customer_name: z.string().min(2).max(20),
+        name: z.string().min(2).max(20),
         address: z.string().min(5).max(80),
         date: z.string().min(8).max(10),
         time: z.string().min(4).max(5),
@@ -68,17 +104,6 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
         email: z.string().email(),
         note: z.string().max(600).optional(),
     });
-
-    const errorMessages = {
-        customer_name:
-            'Name is required and should be 2 to 20 characters long.',
-        address: 'Address is required and must be valid.',
-        date: 'Date is required.',
-        time: 'Time is required.',
-        phone: 'Mobile number is required and must be valid.',
-        email: 'Email is required and must be valid.',
-        note: 'Note should not exceed 600 characters',
-    };
 
     const handleError = (error: Error) => {
         setLoading(false);
@@ -95,39 +120,23 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
 
     const formHandler = async (e: FormEvent) => {
         e.preventDefault();
-        if (!stripe) {
-            return;
-        }
+        if (!stripe) return;
 
         const submittedElements = await elements?.submit();
 
-        // Do validation here
-        clearErrors();
-        const results = formSchema.safeParse({ ...data });
+        const results = formSchema.safeParse({ ...formData });
         if (!results.success) {
-            results.error.issues.forEach((issue) => {
-                setError(
-                    issue.path.at(0) as keyof typeof errorMessages,
-                    errorMessages[
-                        issue.path.at(0) as keyof typeof errorMessages
-                    ]
-                );
-            });
-            return;
+            return setFormState((prev) => ({
+                ...prev,
+                isValid: false,
+            }));
         }
 
         if (submittedElements?.error) {
-            handleError(submittedElements.error as unknown as Error);
-            return;
+            return handleError(submittedElements.error as unknown as Error);
         }
         const order: Order = {
-            customer_name: data.customer_name,
-            phone: data.phone,
-            email: data.email,
-            address: data.address,
-            date: data.date,
-            time: data.time.toString(),
-            note: data.note,
+            ...formData,
             items: cartItems.map(({ id, dishes, numOfPeople }: CartItem) => ({
                 menu_id: id,
                 dishes: dishes.map(({ id }) => id),
@@ -165,11 +174,10 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
         return price + tax + DEV_FEE;
     };
 
-    const handleDatePicked = (date: dayjs.Dayjs | null): void => {
-        if (date) {
-            setData('date', date.format('DD-MM-YYYY'));
-        }
-    };
+    const disableBtn =
+        (loading || cartItems.length === 0 || !formState.isValid) &&
+        formState.isTouched &&
+        formState.isDirty;
 
     return (
         <div className="bg-white relative">
@@ -361,33 +369,27 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
                             {/* <InfoTab /> */}
                             <div>
                                 <h3 className="text-lg font-medium text-gray-900">
-                                    Delivery date & time
+                                    Order date and time
                                 </h3>
 
-                                <div className="mt-6 flex flex-col gap-3.5">
+                                <div className="mt-6 flex items-center flex-wrap justify-center md:flex-nowrap md:justify-between gap-3.5">
                                     <Calendar
-                                        onDatePicked={handleDatePicked}
+                                        onDatePicked={(value) =>
+                                            onFormDataChangeHandler(
+                                                'date',
+                                                value
+                                            )
+                                        }
                                         bookedDates={bookedDates}
                                     />
-                                    {errors.date && (
-                                        <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1">
-                                            {errors.date}
-                                        </span>
-                                    )}
                                     <TimeInput
-                                        state={data.time}
-                                        setState={(time) =>
-                                            setData('time', time)
-                                        }
-                                        setError={(error) =>
-                                            setError('time', error)
+                                        onValueChange={(value) =>
+                                            onFormDataChangeHandler(
+                                                'time',
+                                                value
+                                            )
                                         }
                                     />
-                                    {errors.time && (
-                                        <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1">
-                                            {errors.time}
-                                        </span>
-                                    )}
                                 </div>
                             </div>
 
@@ -398,65 +400,45 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
 
                                 <div className="mt-6 flex flex-col gap-3.5">
                                     <NameInput
-                                        state={data.customer_name}
-                                        setState={(name) =>
-                                            setData('customer_name', name)
-                                        }
-                                    />
-                                    {errors.customer_name && (
-                                        <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1">
-                                            {errors.customer_name}
-                                        </span>
-                                    )}
-                                    <PhoneNumberInput
-                                        state={data.phone as unknown as string}
-                                        setState={(number) =>
-                                            setData(
-                                                'phone',
-                                                number as unknown as number
+                                        onValueChange={(value) =>
+                                            onFormDataChangeHandler(
+                                                'name',
+                                                value
                                             )
                                         }
                                     />
-                                    {errors.phone && (
-                                        <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1">
-                                            {errors.phone}
-                                        </span>
-                                    )}
+                                    <PhoneNumberInput
+                                        onValueChange={(value) =>
+                                            onFormDataChangeHandler(
+                                                'phone',
+                                                value
+                                            )
+                                        }
+                                    />
                                     <EmailInput
-                                        state={data.email}
-                                        setState={(email) =>
-                                            setData('email', email)
+                                        onValueChange={(value) =>
+                                            onFormDataChangeHandler(
+                                                'email',
+                                                value
+                                            )
                                         }
                                     />
-                                    {errors.email && (
-                                        <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1">
-                                            {errors.email}
-                                        </span>
-                                    )}
                                     <AddressInput
-                                        onAddressChange={(address) => null}
-                                    />
-                                    {!isAddressValidated && isDirty && (
-                                        <span className="flex items-center font-medium tracking-wide text-green-500 text-xs ml-1">
-                                            waiting for validation...
-                                        </span>
-                                    )}
-                                    {errors.address && isAddressValidated && (
-                                        <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1">
-                                            {errors.address}
-                                        </span>
-                                    )}
-                                    <NoteInput
-                                        state={data.note}
-                                        setState={(note) =>
-                                            setData('note', note)
+                                        onAddressChange={(value) =>
+                                            onFormDataChangeHandler(
+                                                'address',
+                                                value
+                                            )
                                         }
                                     />
-                                    {errors.note && (
-                                        <span className="flex items-center font-medium tracking-wide text-red-500 text-xs ml-1">
-                                            {errors.note}
-                                        </span>
-                                    )}
+                                    <NoteInput
+                                        onValueChange={(value) =>
+                                            onFormDataChangeHandler(
+                                                'note',
+                                                value
+                                            )
+                                        }
+                                    />
                                 </div>
                             </div>
                         </div>

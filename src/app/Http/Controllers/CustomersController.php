@@ -14,7 +14,7 @@ class CustomersController extends Controller
                 'email' => $request->email,
             ],
             [
-                'name' => $request->customer_name,
+                'name' => $request->name,
                 'phone' => $request->phone,
             ]
         );
