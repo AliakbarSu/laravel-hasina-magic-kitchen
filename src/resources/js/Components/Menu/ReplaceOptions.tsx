@@ -1,48 +1,30 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Dish } from '@/types/application';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { DishComponent } from '@/Components/Menu/Dish';
 
 type OptionsModalProps = {
     dishes: Dish[];
     open: boolean;
+    dish: Dish | null;
     setOpen: (state: boolean) => void;
-    onApply: (id: string) => void;
+    onApply: (id: string, dish_id: string) => void;
 };
 
-export function ReplaceOptionsModal({
+export const ReplaceOptionsModal = ({
     open,
     setOpen,
     dishes = [],
+    dish,
     onApply,
-}: OptionsModalProps) {
-    const cancelButtonRef = useRef(null);
-    const [options, setOptions] = useState<string>('');
-
-    useEffect(() => {
-        setOptions(() => dishes.at(0)?.id || '');
-    }, [dishes]);
-
-    const onInputChangeHandler = (e: SelectChangeEvent) => {
-        setOptions(() => e.target.value);
-    };
-
-    const onApplyHandler = () => {
+}: OptionsModalProps) => {
+    const onClickHandler = (item: Dish) => {
+        onApply(item.id, dish ? dish.id : '');
         setOpen(false);
-        onApply(options);
     };
-
     return (
         <Transition.Root show={open} as={Fragment}>
-            <Dialog
-                as="div"
-                className="relative z-10"
-                initialFocus={cancelButtonRef}
-                onClose={setOpen}
-            >
+            <Dialog as="div" className="relative z-10" onClose={setOpen}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -67,47 +49,23 @@ export function ReplaceOptionsModal({
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         >
                             <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 w-full sm:max-w-2xl sm:p-6">
-                                <div className="sm:col-span-3">
-                                    <form className="mt-2">
-                                        <FormControl fullWidth>
-                                            <InputLabel id="select-dishes">
-                                                Dishes
-                                            </InputLabel>
-                                            <Select
-                                                labelId="select-dishes"
-                                                id="select-dishes"
-                                                value={dishes.at(0)?.id}
-                                                label="Age"
-                                                onChange={onInputChangeHandler}
-                                            >
-                                                {dishes.map(({ name, id }) => (
-                                                    <MenuItem
-                                                        value={id}
-                                                        key={id}
-                                                    >
-                                                        {name}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    </form>
-                                </div>
-                                <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                                    <button
-                                        type="button"
-                                        className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
-                                        onClick={onApplyHandler}
-                                    >
-                                        Apply
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
-                                        onClick={() => setOpen(false)}
-                                        ref={cancelButtonRef}
-                                    >
-                                        Cancel
-                                    </button>
+                                <div className="my-5">
+                                    <div className="flex items-center">
+                                        <h2 className="text-sm font-medium text-gray-500 mr-2">
+                                            Replace with
+                                        </h2>
+                                    </div>
+                                    <div className="relative mt-4 flex flex-wrap flex-col gap-1 p-1">
+                                        {dishes.map((item) => (
+                                            <DishComponent
+                                                key={item.id}
+                                                item={item}
+                                                onClick={() =>
+                                                    onClickHandler(item)
+                                                }
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>
@@ -116,4 +74,4 @@ export function ReplaceOptionsModal({
             </Dialog>
         </Transition.Root>
     );
-}
+};

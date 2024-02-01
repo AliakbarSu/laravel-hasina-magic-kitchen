@@ -52,42 +52,10 @@ export function CustomizeItem(props: {
                         </div>
 
                         <div className="mt-8 lg:col-span-5">
-                            {/* Product details */}
-                            <MenuItems
-                                menu={selectedMenu}
-                                items={selectedMenu.dishes}
-                            />
+                            <MenuItems />
                             <AddExtraDish />
 
-                            {/* <Tags /> */}
-                            {/* Policies */}
-                            {/* <section
-                                aria-labelledby="policies-heading"
-                                className="mt-10"
-                            >
-                                <h2 id="policies-heading" className="sr-only">
-                                    Our Policies
-                                </h2>
-
-                                <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                                    {policies.map((policy) => (
-                                        <div
-                                            key={policy.name}
-                                            className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center"
-                                        >
-                                            <dt>
-                                                <span className="mt-4 text-sm font-medium text-gray-900">
-                                                    {policy.name}
-                                                </span>
-                                            </dt>
-                                            <dd className="mt-1 text-sm text-gray-500">
-                                                {policy.description}
-                                            </dd>
-                                        </div>
-                                    ))}
-                                </dl>
-                            </section> */}
-                            <div className="lg:mt-[560px] mt-10 max-w-7xl w-full flex justify-center lg:justify-end items-center gap-2">
+                            <div className="mt-10 max-w-7xl w-full flex justify-center lg:justify-end items-center gap-2">
                                 <button
                                     type="button"
                                     className="inline-flex max-w-xs w-full justify-center rounded-md bg-white px-3 py-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
@@ -101,7 +69,7 @@ export function CustomizeItem(props: {
                                     className="inline-flex max-w-xs w-full justify-center rounded-md bg-indigo-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
                                     onClick={props.onApplyHandler}
                                 >
-                                    Apply
+                                    Save
                                 </button>
                             </div>
                         </div>

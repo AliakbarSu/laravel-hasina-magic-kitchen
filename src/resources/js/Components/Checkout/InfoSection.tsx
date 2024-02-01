@@ -364,7 +364,7 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
                     </h2>
 
                     <form onSubmit={formHandler} id="checkout-form">
-                        <div className="@container mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0 flex flex-col gap-3.5">
+                        <div className="@container mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0 flex flex-col gap-3.5 @container">
                             {/* Content goes here */}
                             {/* <InfoTab /> */}
                             <div>
@@ -372,7 +372,7 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
                                     Order date and time
                                 </h3>
 
-                                <div className="mt-6 flex items-center flex-wrap justify-center md:flex-nowrap md:justify-between gap-3.5">
+                                <div className="mt-6 flex items-center flex-wrap justify-center @md:flex-nowrap md:justify-between gap-3.5">
                                     <Calendar
                                         onDatePicked={(value) =>
                                             onFormDataChangeHandler(
