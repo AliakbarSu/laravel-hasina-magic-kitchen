@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 
 class OrdersController extends Controller
 {
-    private $delivery_fee_rate = 25.0;
+    private float $delivery_fee_rate = 25.0;
 
     public function get_confirmed_orders_dates(Orders $orders): string
     {

@@ -5,24 +5,32 @@ namespace App\Http\Controllers;
 use App\Models\Orders;
 use Laravel\Cashier\Events\WebhookReceived;
 
-class StripeWebhooks extends Controller
+
+class StripeWebhooks
 {
-    public function handle_event()
+
+    protected OrdersController $orderController;
+    protected Orders $orderModel;
+    protected AdminController $adminController;
+
+    public function __construct(OrdersController $orderController, Orders $orderModel, AdminController $adminController)
     {
+        $this->orderController = $orderController;
+        $this->orderModel = $orderModel;
+        $this->adminController = $adminController;
     }
 
     public function handle(
         WebhookReceived $event,
-        AdminController $adminController,
-        OrdersController $ordersController
-    ) {
+    )
+    {
         if ($event->payload['type'] === 'payment_intent.succeeded') {
             $order_id =
                 $event->payload['data']['object']['metadata']['order_id'];
-            $order = new Orders();
-            $order->mark_as_paid($order_id);
-            $ordersController->customer_order_confirm_mail($order);
-            $adminController->notifiy_new_order($order);
+            $order = $this->orderModel->get_order_by_id($order_id);
+            $order->mark_as_paid();
+            $this->orderController->customer_order_confirmed_mail($order->customer, $order);
+            $this->adminController->notify_new_order($order);
             return response('Webhook Handled', 200);
         }
     }

@@ -24,6 +24,7 @@ class Orders extends Model
         'status',
     ];
 
+
     static function can_palce_order()
     {
         $orders = Orders::where('date', '=', date('today'))->get();
@@ -38,10 +39,9 @@ class Orders extends Model
             });
     }
 
-    public function get_order_by_id(string $id)
+    public function get_order_by_id(string $id): Orders
     {
-        $order = $this->all_orders()->find($id);
-        return $order;
+        return $this->with(['customer', 'addons'])->find($id);
     }
 
     public function all_orders()
@@ -105,14 +105,13 @@ class Orders extends Model
         return $this->BelongsTo(Customers::class);
     }
 
-    public function mark_as_paid($id)
+    public function mark_as_paid(): void
     {
-        $order = Orders::find($id);
-        $order->status = 'paid';
-        $order->save();
+        $this->status = 'paid';
+        $this->save();
     }
 
-    public function availability()
+    public function availability(): array
     {
         $orders = $this->all()
             ->where('date', '>=', date('today'))

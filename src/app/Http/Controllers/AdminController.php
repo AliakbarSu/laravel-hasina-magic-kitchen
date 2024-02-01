@@ -44,7 +44,7 @@ class AdminController extends Controller
             ->with(['orders' => $orders->all_orders()]);
     }
 
-    public function notifiy_new_order(Orders $order)
+    public function notify_new_order(Orders $order): void
     {
         Notification::route('mail', env('NOTIFICATION_EMAIL'))->notify(
             new NewOrder($order)

@@ -4,13 +4,15 @@ namespace App\Notifications;
 
 use App\Models\Orders;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class NewOrder extends Notification
 {
     use Queueable;
+
+    private Orders $order;
 
     /**
      * Create a new notification instance.
@@ -19,7 +21,6 @@ class NewOrder extends Notification
     {
         $this->order = $order;
     }
-    private $order;
 
     public function toNexmo($notifiable)
     {
@@ -28,6 +29,7 @@ class NewOrder extends Notification
             'text' => 'New Order' . $this->order->id,
         ];
     }
+
     /**
      * Get the notification's delivery channels.
      *
@@ -35,7 +37,7 @@ class NewOrder extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['nexmo'];
+        return ['mail'];
     }
 
     /**
@@ -43,6 +45,7 @@ class NewOrder extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        Log::info('New order notification sent', ['order_id' => $this->order->id]);
         return (new MailMessage())
             ->greeting('New Order')
             ->action('View Order', url('/'))
@@ -57,7 +60,7 @@ class NewOrder extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-                //
-            ];
+            //
+        ];
     }
 }

@@ -58,6 +58,8 @@ Route::get('/availability', [OrdersController::class, 'get_availability']);
 Route::post('/validate/address', [OrdersController::class, 'validate_address']);
 Route::post('/contact', [AdminController::class, 'contact']);
 
+Route::post('webhooks/stripe', [\Laravel\Cashier\Http\Controllers\WebhookController::class, 'handleWebhook']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
