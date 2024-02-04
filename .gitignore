@@ -10,6 +10,7 @@
 **/*/vendor
 /src/vendor
 .env
+.env.dev
 .env.backup
 .env.production
 .phpunit.result.cache
