@@ -11,7 +11,6 @@ provider:
   stage: ${env:DEPLOY_STAGE}
   httpApi:
     cors: true
-    disableDefaultEndpoint: true
   # Environment variables
   environment:
     APP_ENV: ${sls:stage}
@@ -118,9 +117,8 @@ plugins:
 constructs:
   website:
     type: server-side-website
-    #    domain:
-    #      - hasina.store
-    #      - www.hasina.store
+    domain: hasina.store
+    certificate: arn:aws:acm:ap-southeast-2:092355519212:certificate/211e5da7-6d31-439d-bbcf-505cd3bce8e6
     assets:
       '/build/*': public/build/
       '/favicon_io/*': public/favicon_io/
