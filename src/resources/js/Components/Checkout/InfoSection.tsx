@@ -4,7 +4,6 @@ import {
     useElements,
     useStripe,
 } from '@stripe/react-stripe-js';
-import { router } from '@inertiajs/react';
 import { Addon, Order } from '@/types/application';
 import axios from 'axios';
 import { formatNZD } from '@/utils/currentcy';
@@ -15,7 +14,6 @@ import OrderFailed from '@/Components/Checkout/OrderFailed';
 import { useSelector } from 'react-redux/es/hooks/useSelector';
 import {
     CartItem,
-    clearCart,
     removeAddon,
     removeItem,
     selectCartTotal,
@@ -154,8 +152,8 @@ const InfoSection = ({ bookedDates }: { bookedDates: dayjs.Dayjs[] }) => {
             await stripe?.confirmCardPayment(data.client_secret, {
                 payment_method: paymentMethod?.paymentMethod?.id,
             });
-            dispatch(clearCart());
-            router.visit(route('order.summary', { id: data.id }));
+            // dispatch(clearCart());
+            // router.visit(route('order.summary', { id: data.id }));
         } catch (err) {
             console.log(err);
             setOrderFailedModal(true);

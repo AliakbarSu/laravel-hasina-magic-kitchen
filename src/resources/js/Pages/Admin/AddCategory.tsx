@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import axios from 'axios';
 import { Category } from '@/types/application';
 import Categories from './Categories';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 
 export default function AddCategory({
     auth,
@@ -12,18 +13,30 @@ export default function AddCategory({
 }: PageProps<{ categories: Category[] }>) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const fileRef = useRef(null);
+    const [photoPreviews, setPhotoPreviews] = useState<
+        string[] | ArrayBuffer[]
+    >([]);
     const { data, setData, reset, errors, setError, clearErrors } = useForm({
         name: '',
         description: '',
+        image: '',
     });
 
     const onAddCategorySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (photoPreviews.length == 0) {
+            setError('image', 'Please upload a photo');
+            return;
+        }
         try {
             clearErrors();
             setLoading(true);
-            await axios.post('/api/category', data);
+            const result = await axios.post('/api/category', data);
+            const categoryId = result.data.id;
+            await uploadphotos(categoryId);
             reset();
+            setPhotoPreviews([]);
             setMessage('Category added successfully');
         } catch (err: unknown) {
             type ErrorType = {
@@ -42,6 +55,35 @@ export default function AddCategory({
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const uploadphotos = (id: string) => {
+        const form = new FormData();
+        form.append('id', id);
+        if (
+            fileRef?.current &&
+            (fileRef?.current as { files: File[] }).files.length > 0
+        ) {
+            form.append(
+                'image',
+                (fileRef?.current as { files: File[] }).files[0]
+            );
+            return axios.post('/api/category/media', form);
+        } else {
+            return Promise.resolve();
+        }
+    };
+
+    const setPreview = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = (e.target as unknown as { files: File[] }).files;
+        for (let i = 0; i < files.length; i++) {
+            setPhotoPreviews(
+                (prevs) =>
+                    [...prevs, URL.createObjectURL(files[i])] as
+                        | string[]
+                        | ArrayBuffer[]
+            );
         }
     };
 
@@ -130,6 +172,58 @@ export default function AddCategory({
                                         Write a few sentences about the
                                         category.
                                     </p>
+                                </div>
+                                <div className="col-span-full">
+                                    <label
+                                        htmlFor="photo"
+                                        className="block text-sm font-medium leading-6 text-gray-900"
+                                    >
+                                        Dish Photo
+                                    </label>
+                                    <div className="mt-2 flex items-center gap-x-3">
+                                        {photoPreviews.length == 0 && (
+                                            <UserCircleIcon
+                                                className="h-12 w-12 text-gray-300"
+                                                aria-hidden="true"
+                                            />
+                                        )}
+                                        <div>
+                                            {photoPreviews.map((preview, i) => (
+                                                <img
+                                                    className="h-10 w-10 rounded-full"
+                                                    src={preview as string}
+                                                    key={i}
+                                                    alt=""
+                                                />
+                                            ))}
+                                        </div>
+                                        <input
+                                            onChange={setPreview}
+                                            accept="image/jpg,png"
+                                            multiple
+                                            ref={fileRef}
+                                            type="file"
+                                            id="photo"
+                                            name="photo"
+                                            hidden
+                                        />
+                                        <button
+                                            onClick={() =>
+                                                (
+                                                    fileRef?.current as unknown as HTMLInputElement
+                                                ).click()
+                                            }
+                                            type="button"
+                                            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                        >
+                                            Change
+                                        </button>
+                                    </div>
+                                    {errors.image && (
+                                        <span className="flex items-center font-medium tracking-wide text-red-500 text-xs mt-2 ml-1">
+                                            {errors.image}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>

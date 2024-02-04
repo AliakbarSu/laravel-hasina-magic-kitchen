@@ -21,11 +21,13 @@ class MenuController extends Controller
             'price' => 'required|numeric',
             'dishes' => 'required|array|exists:dishes,id',
             'options' => 'required|array|exists:dishes,id',
+            'category' => 'required|exists:categories,id',
         ]);
         $menu = new Menu();
         $menu->name = $validatedData['name'];
         $menu->description = $validatedData['description'];
         $menu->price = $validatedData['price'];
+        $menu->category_id = $validatedData['category'];
         $menu->save();
         $menu->dishes()->attach($validatedData['dishes']);
         $menu->options()->attach($validatedData['options']);
@@ -41,7 +43,7 @@ class MenuController extends Controller
             'image' => 'required',
         ]);
         $menu = $menus->all()->find($validatedData['id']);
-        $menu->attachMedia($request->file('image'));
+        $menu->addImage($request->file('image'));
         Log::info('Menu media added', ['id' => $menu->id]);
         return response()->json(['message' => 'Menu media added'], 200);
     }

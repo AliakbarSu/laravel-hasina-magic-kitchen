@@ -47,7 +47,7 @@ class DishController extends Controller
         ]);
         $dish = $dishes->all()->find($validatedData['id']);
         try {
-            $dish->attachMedia($request->file('image'));
+            $dish->addImage($request->file('image'));
         } catch (Exception $e) {
             Log::error('Failed to add media for dish', $dish->id);
             Log::error($e->getMessage());

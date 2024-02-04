@@ -21,7 +21,7 @@ class OrdersController extends Controller
         return $orders->get_confirmed_orders_dates()->toJson();
     }
 
-    public function all_orders(Orders $orders)
+    public function all_orders(Orders $orders): string
     {
         return $orders->all_orders()->toJson();
     }
@@ -37,8 +37,8 @@ class OrdersController extends Controller
     )
     {
         $validatedData = $this->validate_order($request);
-        // TODO Needs to be implemented
-        // TODO Add notofiication about new order to the admin
+        // TODO:  Needs to be implemented
+        // TODO:  Add notification about new order to the admin
         // if (!Orders::can_palce_order()) {
         //     return response(400)->json('Cannot place order for this date!');
         // }
@@ -236,9 +236,10 @@ class OrdersController extends Controller
 
     }
 
-    private function customer_order_confirmed_mail($customer, $order)
+    public function customer_order_confirmed_mail($customer, $order): void
     {
         try {
+            Log::info('Sending order confirmation email to customer');
             Mail::to($customer->email)->send(new OrderConfirmed($order));
         } catch (\Throwable $th) {
             Log::error($th);

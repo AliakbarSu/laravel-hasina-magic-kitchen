@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth')->group(function () {
     Route::group(['prefix' => 'category'], function () {
         Route::post('/', [CategoryController::class, 'add_category']);
+        Route::post('/media', [CategoryController::class, 'add_category_media']);
         Route::delete('/{id}', [CategoryController::class, 'delete_category']);
     });
 

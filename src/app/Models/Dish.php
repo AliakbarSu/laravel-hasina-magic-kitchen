@@ -36,6 +36,11 @@ class Dish extends Model
         }, $item->fetchAllMedia()->toArray());
     }
 
+    public function addImage($image): void
+    {
+        $this->attachMedia($image, ["folder" => "hasinaMagicKitchen/dish", "overwrite" => false, "use_filename" => true, "unique_filename" => false]);
+    }
+
     public function category(): HasOne
     {
         return $this->hasOne(Category::class, 'id', 'category_id');

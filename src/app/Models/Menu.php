@@ -6,6 +6,8 @@ use CloudinaryLabs\CloudinaryLaravel\MediaAlly;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Menu extends Model
 {
@@ -42,7 +44,7 @@ class Menu extends Model
         }, $item->fetchAllMedia()->toArray());
     }
 
-    public function dishes()
+    public function dishes(): BelongsToMany
     {
         return $this->belongsToMany(Dish::class, 'dish_menu');
     }
@@ -52,12 +54,17 @@ class Menu extends Model
         return $this->belongsToMany(Dish::class, 'dish_menu_order');
     }
 
-    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function options()
+    public function addImage($image): void
+    {
+        $this->attachMedia($image, ["folder" => "hasinaMagicKitchen/menu", "overwrite" => false, "use_filename" => true, "unique_filename" => false]);
+    }
+
+    public function options(): BelongsToMany
     {
         return $this->belongsToMany(Dish::class, 'menu_options');
     }

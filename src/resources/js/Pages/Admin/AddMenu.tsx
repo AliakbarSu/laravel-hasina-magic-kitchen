@@ -3,7 +3,7 @@ import { Head, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { UserCircleIcon } from '@heroicons/react/24/solid';
-import { Dish, Menu } from '@/types/application';
+import { Category, Dish, Menu } from '@/types/application';
 import axios from 'axios';
 import Menus from './Menus';
 
@@ -11,7 +11,8 @@ export default function AddMenu({
     auth,
     dishes,
     menus,
-}: PageProps<{ dishes: Dish[]; menus: Menu[] }>) {
+    categories,
+}: PageProps<{ categories: Category[]; dishes: Dish[]; menus: Menu[] }>) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const fileRef = useRef(null);
@@ -25,6 +26,7 @@ export default function AddMenu({
         dishes: string[];
         options: string[];
         image: string;
+        category: string;
     }>({
         name: '',
         price: '',
@@ -32,6 +34,7 @@ export default function AddMenu({
         dishes: [],
         options: [],
         image: '',
+        category: categories.at(0)?.id || '',
     });
 
     const onAddMenuSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -349,6 +352,35 @@ export default function AddMenu({
                                         </span>
                                     )}
                                 </div>
+
+                                <label
+                                    htmlFor="category"
+                                    className="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                    Category
+                                </label>
+                                <div className="mt-2">
+                                    <select
+                                        value={data.category}
+                                        onChange={(e) =>
+                                            setData('category', e.target.value)
+                                        }
+                                        id="category"
+                                        name="category"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                                    >
+                                        {categories.map(({ name, id }) => (
+                                            <option key={id} value={id}>
+                                                {name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {errors.category && (
+                                    <span className="flex items-center font-medium tracking-wide text-red-500 text-xs mt-2 ml-1">
+                                        {errors.category}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>

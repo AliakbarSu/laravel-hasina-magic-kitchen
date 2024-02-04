@@ -4,7 +4,6 @@ import Nav from '@/Layouts/Nav';
 import { Footer } from '@/Components/UI/Footer';
 import MessageSent from '@/Components/Contact/MessageSent';
 import { z } from 'zod';
-import { PhoneNumberInput } from '@/Components/Checkout/PhoneNumberInput';
 
 export default function Contact() {
     const [messageSent, setMessageSent] = useState(false);
@@ -206,15 +205,15 @@ export default function Contact() {
                             )}
                         </div>
                         <div className="sm:col-span-2">
-                            <PhoneNumberInput
-                                state={data.number as unknown as string}
-                                setState={(number) =>
-                                    setData(
-                                        'number',
-                                        number as unknown as number
-                                    )
-                                }
-                            />
+                            {/*<PhoneNumberInput*/}
+                            {/*    state={data.number as unknown as string}*/}
+                            {/*    setState={(number) =>*/}
+                            {/*        setData(*/}
+                            {/*            'number',*/}
+                            {/*            number as unknown as number*/}
+                            {/*        )*/}
+                            {/*    }*/}
+                            {/*/>*/}
                             {errors.number && (
                                 <span className="flex items-center font-medium tracking-wide text-red-500 text-xs mt-2 ml-1">
                                     {errors.number}

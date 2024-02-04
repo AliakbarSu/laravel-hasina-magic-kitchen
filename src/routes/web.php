@@ -112,6 +112,7 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Admin/AddMenu', [
             'dishes' => $dishes->all()->toArray(),
             'menus' => Menu::all()->toArray(),
+            'categories' => Category::all()->toArray(),
         ]);
     })->name('admin.addMenu');
 
