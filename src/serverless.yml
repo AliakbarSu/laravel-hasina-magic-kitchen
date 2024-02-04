@@ -3,7 +3,9 @@ service: laravel
 provider:
   name: aws
   iam:
-    role: arn:aws:iam::aws:policy/AmazonRDSFullAccess
+    role:
+      managedPolicies:
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
   region: ap-southeast-2
   #  profile: allie
   stage: ${env:DEPLOY_STAGE}
