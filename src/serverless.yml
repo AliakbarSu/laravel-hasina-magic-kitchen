@@ -10,7 +10,7 @@ provider:
   # Environment variables
   environment:
     APP_ENV: ${sls:stage}
-    ASSET_URL: ${website.url}
+    ASSET_URL: ${construct:website.url}
     APP_NAME: "Hasina's Magic Kitchen"
     APP_KEY: ${env:APP_KEY}
     APP_DEBUG: true
