@@ -2,7 +2,6 @@ service: laravel
 
 provider:
   name: aws
-  # The AWS region in which to deploy (us-east-1 is the default)
   region: ap-southeast-2
   #  profile: allie
   stage: dev
@@ -10,7 +9,73 @@ provider:
     cors: true
   # Environment variables
   environment:
-    APP_ENV: ${sls:stage} # Or use ${sls:stage} if you want the environment to match the stage
+    APP_ENV: ${sls:stage}
+    ASSET_URL: ${website.url}
+    APP_NAME: "Hasina's Magic Kitchen"
+    APP_KEY: ${env:APP_KEY}
+    APP_DEBUG: true
+    APP_URL: "https://d13veech5xz44n.cloudfront.net/"
+    SESSION_DOMAIN: localhost
+    SANCTUM_STATEFUL_DOMAINS: hasina.store
+    LOG_CHANNEL: stack
+    LOG_DEPRECATIONS_CHANNEL: null
+    LOG_LEVEL: debug
+    DB_CONNECTION: mysql
+    RDS_HOSTNAME: "hasina-magic-kitchen.coayqf4jywum.ap-southeast-2.rds.amazonaws.com"
+    RDS_PORT: "3306"
+    RDS_DB_NAME: "hasina-magic-kitchen"
+    RDS_USERNAME: "admin"
+    RDS_PASSWORD: ${env:RDS_PASSWORD}
+    BROADCAST_DRIVER: log
+    CACHE_DRIVER: redis
+    FILESYSTEM_DISK: local
+    QUEUE_CONNECTION: sync
+    SESSION_DRIVER: redis
+    SESSION_LIFETIME: 120
+    SESSION_SAME_SITE: Strict
+    MEMCACHED_HOST: 127.0.0.1
+    REDIS_HOST: ${env:REDIS_HOST}
+    REDIS_PASSWORD: null
+    REDIS_PORT: 6379
+    REDIS_CLIENT: "predis"
+    MAIL_MAILER: smtp
+    MAIL_HOST: sandbox.smtp.mailtrap.io
+    MAIL_PORT: 2525
+    MAIL_USERNAME: ${env:MAIL_USERNAME}
+    MAIL_PASSWORD: ${env:MAIL_PASSWORD}
+    MAIL_ENCRYPTION: tls
+    MAIL_FROM_ADDRESS: "hello@alisultani.com"
+    MAIL_FROM_NAME: "Hasina Magic Kitchen"
+    AWS_DEFAULT_REGION: ap-southeast-2
+    AWS_BUCKET:
+    AWS_USE_PATH_STYLE_ENDPOINT: false
+    PUSHER_APP_ID:
+    PUSHER_APP_KEY:
+    PUSHER_APP_SECRET:
+    PUSHER_HOST:
+    PUSHER_PORT: 443
+    PUSHER_SCHEME: https
+    PUSHER_APP_CLUSTER: mt1
+    VITE_PUSHER_APP_KEY: "${PUSHER_APP_KEY}"
+    VITE_PUSHER_HOST: "${PUSHER_HOST}"
+    VITE_PUSHER_PORT: "${PUSHER_PORT}"
+    VITE_PUSHER_SCHEME: "${PUSHER_SCHEME}"
+    VITE_PUSHER_APP_CLUSTER: "${PUSHER_APP_CLUSTER}"
+    STRIPE_KEY: ${env:STRIPE_KEY}
+    STRIPE_SECRET: ${env:STRIPE_SECRET}
+    STRIPE_WEBHOOK_SECRET: ${env:STRIPE_WEBHOOK_SECRET}
+    CASHIER_CURRENCY: nzd
+    POSTMARK_TOKEN: ${env:POSTMARK_TOKEN}
+    NOTIFICATION_EMAIL: ${env:NOTIFICATION_EMAIL}
+    CLOUDINARY_URL: "cloudinary://663794977658427:5xF12ca_Ip5rdkOk2AR4XV9K8bg@dd1okznpy"
+    CLOUDINARY_UPLOAD_PRESET: ml_default
+    CLOUDINARY_NOTIFICATION_URL:
+    GOOGLE_ADDRESS_API: https://addressvalidation.googleapis.com/v1:validateAddress?key=${env:GOOGLE_ADDRESS_API_KEY}
+    VONAGE_API: "https://rest.nexmo.com/sms/json"
+    VONAGE_KEY: ${env:VONAGE_KEY}
+    VONAGE_SECRET: ${env:VONAGE_SECRET}
+    SMS_FROM: ${env:SMS_FROM}
+    SMS_TO: ${env:SMS_TO}
 
 package:
   # Files and directories to exclude from deployment
@@ -45,7 +110,6 @@ functions:
     #          input: '"schedule:run"'
 
 plugins:
-  # We need to include the Bref plugin
   - ./vendor/bref/bref
   - serverless-lift
 constructs:
