@@ -123,7 +123,7 @@ constructs:
     #      - www.hasina.store
     assets:
       '/build/*': public/build/
-      'favicon.ico': public/favicon.ico
+      '/favicon_io/*': public/favicon_io/
       'robots.txt': public/robots.txt
     forwardedHeaders:
       - Accept
