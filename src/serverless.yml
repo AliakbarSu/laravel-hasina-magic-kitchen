@@ -11,6 +11,7 @@ provider:
   stage: ${env:DEPLOY_STAGE}
   httpApi:
     cors: true
+    disableDefaultEndpoint: true
   # Environment variables
   environment:
     APP_ENV: ${sls:stage}
@@ -117,8 +118,13 @@ plugins:
 constructs:
   website:
     type: server-side-website
+    #    domain:
+    #      - hasina.store
+    #      - www.hasina.store
     assets:
       '/build/*': public/build/
+      'favicon.ico': public/favicon.ico
+      'robots.txt': public/robots.txt
     forwardedHeaders:
       - Accept
       - Accept-Language
