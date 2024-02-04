@@ -4,13 +4,13 @@ provider:
   name: aws
   # The AWS region in which to deploy (us-east-1 is the default)
   region: ap-southeast-2
-  profile: allie
+  #  profile: allie
   stage: dev
   httpApi:
     cors: true
   # Environment variables
   environment:
-    APP_ENV: local # Or use ${sls:stage} if you want the environment to match the stage
+    APP_ENV: ${sls:stage} # Or use ${sls:stage} if you want the environment to match the stage
 
 package:
   # Files and directories to exclude from deployment
