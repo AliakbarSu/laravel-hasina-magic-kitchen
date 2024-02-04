@@ -118,7 +118,7 @@ constructs:
   website:
     type: server-side-website
     domain: hasina.store
-    certificate: arn:aws:acm:ap-southeast-2:092355519212:certificate/211e5da7-6d31-439d-bbcf-505cd3bce8e6
+    certificate: arn:aws:acm:us-east-1:092355519212:certificate/5826db7d-74aa-4d75-8e24-3729c01a0aef
     assets:
       '/build/*': public/build/
       '/favicon_io/*': public/favicon_io/
