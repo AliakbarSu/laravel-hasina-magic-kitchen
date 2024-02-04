@@ -46,8 +46,6 @@ provider:
     MAIL_ENCRYPTION: tls
     MAIL_FROM_ADDRESS: "hello@alisultani.com"
     MAIL_FROM_NAME: "Hasina Magic Kitchen"
-    AWS_DEFAULT_REGION: ap-southeast-2
-    AWS_BUCKET:
     AWS_USE_PATH_STYLE_ENDPOINT: false
     PUSHER_APP_ID:
     PUSHER_APP_KEY:
