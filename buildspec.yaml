@@ -22,4 +22,4 @@ phases:
       - npm run build
   post_build:
     commands:
-      - serverless deploy --stage=DEPLOY_STAGE
+      - serverless deploy
