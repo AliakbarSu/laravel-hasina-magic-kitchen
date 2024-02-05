@@ -2,6 +2,11 @@ service: laravel
 
 provider:
   name: aws
+  vpc:
+    securityGroupIds:
+      - sg-031e549a09f57d376
+    subnetIds:
+      - subnet-06c28fd5b5dfc0525
   iam:
     role:
       managedPolicies:
