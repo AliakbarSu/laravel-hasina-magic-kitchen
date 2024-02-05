@@ -24,7 +24,7 @@ provider:
     APP_NAME: "Hasina's Magic Kitchen"
     APP_KEY: ${env:APP_KEY}
     APP_DEBUG: true
-    APP_URL: "https://d13veech5xz44n.cloudfront.net/"
+    APP_URL: hasina.store
     SESSION_DOMAIN: localhost
     SANCTUM_STATEFUL_DOMAINS: hasina.store
     LOG_CHANNEL: stack
