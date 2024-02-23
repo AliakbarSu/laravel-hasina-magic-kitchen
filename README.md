@@ -6,20 +6,33 @@
 
 ## Food Catering Management System
 
-This GitHub repository contains a web application built using the Laravel framework and AWS services, designed to cater to the needs of a food catering business. The system provides a comprehensive solution for managing transactions, order placements, and seamless communication with customers through email and SMS notifications.
+This GitHub repository contains a web application built using the Laravel framework and AWS services, designed to cater
+to the needs of a food catering business. The system provides a comprehensive solution for managing transactions, order
+placements, and seamless communication with customers through email and SMS notifications.
 
 ## Key Features
 
--   **Order Management:** Customers can easily browse through the available menu items, place orders, and track their order status. The system provides a user-friendly interface for managing orders efficiently.
--   **Transaction Handling:** The application facilitates secure and reliable transaction management, allowing customers to make online payments for their orders. Integration with popular payment gateways ensures smooth payment processing.
--   **Email Notifications:** Automated email notifications are sent to customers at various stages of the order lifecycle. These notifications include order confirmation, payment receipt, and order status updates, ensuring clear and timely communication.
--   **SMS Notifications:** Real-time SMS notifications are sent to customers, providing order confirmations, delivery updates, and any important changes related to their orders. This feature enables efficient communication and enhances the customer experience.
+- **Order Management:** Customers can easily browse through the available menu items, place orders, and track their
+  order status. The system provides a user-friendly interface for managing orders efficiently.
+- **Transaction Handling:** The application facilitates secure and reliable transaction management, allowing customers
+  to make online payments for their orders. Integration with popular payment gateways ensures smooth payment processing.
+- **Email Notifications:** Automated email notifications are sent to customers at various stages of the order lifecycle.
+  These notifications include order confirmation, payment receipt, and order status updates, ensuring clear and timely
+  communication.
+- **SMS Notifications:** Real-time SMS notifications are sent to customers, providing order confirmations, delivery
+  updates, and any important changes related to their orders. This feature enables efficient communication and enhances
+  the customer experience.
 
 ## Additional Features
 
--   **Menu Management:** The system provides an intuitive interface for managing menus, including the ability to add, update, and delete menu items. Menu customization options, such as categorization and pricing, are also available.
--   **Customer Management:** The application allows efficient customer management, including the ability to store customer details, order history, and preferences. This helps in providing personalized services and targeted marketing campaigns.
--   **Reporting and Analytics:** Comprehensive reporting and analytics functionalities are integrated to provide valuable insights into sales, popular menu items, customer preferences, and other key metrics. This information assists in making data-driven business decisions.
+- **Menu Management:** The system provides an intuitive interface for managing menus, including the ability to add,
+  update, and delete menu items. Menu customization options, such as categorization and pricing, are also available.
+- **Customer Management:** The application allows efficient customer management, including the ability to store customer
+  details, order history, and preferences. This helps in providing personalized services and targeted marketing
+  campaigns.
+- **Reporting and Analytics:** Comprehensive reporting and analytics functionalities are integrated to provide valuable
+  insights into sales, popular menu items, customer preferences, and other key metrics. This information assists in
+  making data-driven business decisions.
 
 ## Contributing
 
@@ -32,11 +45,15 @@ This project is not open for contributions at this time.
     - php run dev
 
 ## Deployment on EKS
-In order to deploy this application on AWS EKS, we need to build two docker images with names 
+
+In order to deploy this application on AWS EKS, we need to build two docker images with names
+
 - `alisultani/hasina-magic-kitchen:frontend-v1`
 - `alisultani/hasina-magic-kitchen:backend-v1`
 
 Next we need to create a VPC
 Next we need to create an EKS cluster
 Next we need to create an EFS file system
+
+Build trigger
 
